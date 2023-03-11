@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    id 'com.google.dagger.hilt.android'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -21,10 +21,18 @@ android {
 
     buildTypes {
         release {
+            debuggable false
             minifyEnabled false
+            buildConfigField "boolean", "ALLOW_LOGS", "false"
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable true
+            buildConfigField "boolean", "ALLOW_LOGS", "true"
+            applicationIdSuffix ".debug"
+        }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
