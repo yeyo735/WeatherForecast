@@ -43,4 +43,11 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="search_menu">Search</string>
+    <string name="separator">-</string>
+    <string name="condition">It\'\s a %s day</string>
+    <string name="temperature">%s\u00B0F</string>
+    <string name="wind">%s\mph</string>
+    <string name="press">%s\%%</string>
+
 </resources>
