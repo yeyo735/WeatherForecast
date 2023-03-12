@@ -13,10 +13,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
-class WeatherModule {
+object WeatherModule {
+
+    private const val BASE_URL =
+        "https://api.weatherapi.com/v1/"
 
     @Provides
-    fun provideLoggerInterceptor(): Interceptor{
+    fun provideLoggerInterceptor(): Interceptor {
         return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     }
 
@@ -30,7 +33,7 @@ class WeatherModule {
     @Provides
     fun provideMonstersService(client: OkHttpClient): WeatherService {
         return Retrofit.Builder()
-            .baseUrl(WeatherService.BASE_URL)
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
