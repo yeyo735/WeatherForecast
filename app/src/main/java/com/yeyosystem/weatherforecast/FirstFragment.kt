@@ -10,6 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.yeyosystem.weatherforecast.adapter.ForecastAdapter
 import com.yeyosystem.weatherforecast.data.Current
 import com.yeyosystem.weatherforecast.data.ForecastDay
 import com.yeyosystem.weatherforecast.data.Location
@@ -18,6 +22,7 @@ import com.yeyosystem.weatherforecast.viewmodel.WeatherViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -27,6 +32,9 @@ class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
     private val weatherViewModel: WeatherViewModel by viewModels()
+
+    @Inject
+    lateinit var forecastAdapter: ForecastAdapter
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -73,13 +81,15 @@ class FirstFragment : Fragment() {
         weatherViewModel.weathers.observe(viewLifecycleOwner) {
             showLocationInformation(it.location)
             showCurrentInformation(it.current)
-            showNextDays(it.forecast.forecastDay)
+            showNextDays(it.forecast.forecastday)
         }
         binding.viewModel = weatherViewModel
+        binding.recyclerForecast.adapter = forecastAdapter
     }
 
     private fun showNextDays(forecastDay: List<ForecastDay>) {
-
+        forecastAdapter.submitList(forecastDay)
+        binding.recyclerForecast.adapter = forecastAdapter
     }
 
     private fun showCurrentHour() {
@@ -98,7 +108,8 @@ class FirstFragment : Fragment() {
         binding.textCurrentTemperature.text =
             getString(R.string.temperature, current.temp_f.toString())
         binding.textCurrentWind.text = getString(R.string.wind, current.wind_mph.toInt().toString())
-        binding.textCurrentPressure.text = getString(R.string.press, current.precip_in.toInt().toString())
+        binding.textCurrentPressure.text =
+            getString(R.string.press, current.precip_in.toInt().toString())
         binding.textCurrentCondition.text =
             getString(R.string.condition, current.condition.text.lowercase())
         Glide
