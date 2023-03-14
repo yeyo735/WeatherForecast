@@ -20,21 +20,6 @@
         android:background="#83002762"
         tools:context=".FirstFragment">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_city"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:layout_marginEnd="0dp"
-            android:maxHeight="200dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/list_item_location">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
@@ -160,5 +145,19 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:listitem="@layout/list_item_forecast" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_city"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:maxHeight="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/list_item_location">
+
+        </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -2,8 +2,7 @@
     <string name="app_name">Weather Forecast</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="first_fragment_label">Weather forecast</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="search_menu">Search</string>
@@ -13,6 +12,7 @@
     <string name="wind">%s\mph</string>
     <string name="press">%s\%%</string>
     <string name="third_temperature">%s°/%s°F</string>
+    <string name="search_hint">Enter location</string>
 
 
 </resources>

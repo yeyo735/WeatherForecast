@@ -3,17 +3,18 @@ package com.yeyosystem.weatherforecast
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
+import android.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.yeyosystem.weatherforecast.adapter.ForecastAdapter
+import com.yeyosystem.weatherforecast.adapter.LocationAdapter
+import com.yeyosystem.weatherforecast.adapter.OnItemClickListener
 import com.yeyosystem.weatherforecast.data.Current
 import com.yeyosystem.weatherforecast.data.ForecastDay
 import com.yeyosystem.weatherforecast.data.Location
@@ -36,6 +37,9 @@ class FirstFragment : Fragment() {
     @Inject
     lateinit var forecastAdapter: ForecastAdapter
 
+    @Inject
+    lateinit var locationAdapter: LocationAdapter
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -47,7 +51,6 @@ class FirstFragment : Fragment() {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_first, container, false)
         binding.lifecycleOwner = this
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,32 +62,61 @@ class FirstFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 // Add menu items here
                 menuInflater.inflate(R.menu.menu_main, menu)
+
+                val searchItem = menu.findItem(R.id.search)
+                val searchView = searchItem.actionView as SearchView
+                searchView.queryHint = getString(R.string.search_hint)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     R.id.search -> {
-                        // clearCompletedTasks()
+                        showSearch(menuItem)
                         true
                     }
-                    /*R.id.menu_refresh -> {
-                        // loadTasks(true)
-                        true
-                    }*/
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         showCurrentHour()
-        weatherViewModel.weathers.observe(viewLifecycleOwner) {
-            showLocationInformation(it.location)
-            showCurrentInformation(it.current)
-            showNextDays(it.forecast.forecastday)
+        val weatherData = weatherViewModel.getWeatherForecastForCity("New York")
+        weatherData.observe(viewLifecycleOwner) { weather ->
+            showLocationInformation(weather.location)
+            showCurrentInformation(weather.current)
+            showNextDays(weather.forecast.forecastday)
         }
+
+        onClickLocation()
+
         binding.viewModel = weatherViewModel
         binding.recyclerForecast.adapter = forecastAdapter
+        binding.recyclerCity.adapter = locationAdapter
+    }
+
+    private fun onClickLocation() {
+        locationAdapter.apply {
+            onItemClickListener = object: OnItemClickListener {
+                override fun onItemClick(item: Location) {
+                    if (item == weatherViewModel.location.value) {
+                        weatherViewModel.location.value = null
+                    }else{
+                        val weatherData = weatherViewModel.getWeatherForecastForCity(item.name)
+                        weatherData.observe(viewLifecycleOwner) { weather ->
+                            showLocationInformation(weather.location)
+                            showCurrentInformation(weather.current)
+                            showNextDays(weather.forecast.forecastday)
+                        }
+                        binding.recyclerCity.visibility = View.GONE
+                        binding.recyclerCity.isVisible = false
+                        locationAdapter.resetSelectedItem()
+                        locationAdapter.notifyDataSetChanged()
+                    }
+                }
+
+            }
+        }
     }
 
     private fun showNextDays(forecastDay: List<ForecastDay>) {
@@ -117,6 +149,41 @@ class FirstFragment : Fragment() {
             .load(current.condition.icon.replace("//", "https://"))
             .centerCrop()
             .into(binding.imageCurrent)
+    }
+
+    fun showSearch(menuItem: MenuItem) {
+        val searchView = menuItem.actionView as SearchView
+        searchView.queryHint = getString(R.string.search_hint)
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                // Handle search query submission
+                /*if (query.isNotBlank())
+                    binding.recyclerCity.visibility = View.VISIBLE
+                else
+                    binding.recyclerCity.visibility = View.GONE*/
+
+                val cities = weatherViewModel.getCities(query)
+                cities.observe(viewLifecycleOwner) { locations ->
+                    showLocations(locations)
+                }
+
+                searchView.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                // Handle search query text change
+                return true
+            }
+        })
+    }
+
+    private fun showLocations(locations: List<Location>?) {
+        locationAdapter.submitList(locations)
+        binding.recyclerCity.visibility = View.VISIBLE
+        binding.recyclerCity.isVisible = true
+        binding.recyclerCity.adapter = locationAdapter
     }
 
     override fun onDestroyView() {
