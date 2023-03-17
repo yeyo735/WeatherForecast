@@ -158,23 +158,18 @@ class FirstFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 // Handle search query submission
-                /*if (query.isNotBlank())
-                    binding.recyclerCity.visibility = View.VISIBLE
-                else
-                    binding.recyclerCity.visibility = View.GONE*/
-
-                val cities = weatherViewModel.getCities(query)
-                cities.observe(viewLifecycleOwner) { locations ->
-                    showLocations(locations)
-                }
-
                 searchView.clearFocus()
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                // Handle search query text change
-                return true
+                if(newText.isNotBlank()) {
+                    val cities = weatherViewModel.getCities(newText)
+                    cities.observe(viewLifecycleOwner) { locations ->
+                        showLocations(locations)
+                    }
+                }
+                return false
             }
         })
     }
